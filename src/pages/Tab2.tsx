@@ -20,7 +20,7 @@ import './Tab2.css';
 
 const Tab2: React.FC = () => {
 
-  const { takePhoto } = usePhotoGallery();
+  const { photos, takePhoto } = usePhotoGallery();
 
   return (
     <IonPage>
@@ -35,14 +35,22 @@ const Tab2: React.FC = () => {
             <IonTitle size="large">Tab 2</IonTitle>
           </IonToolbar>
         </IonHeader>
-        <IonFab vertical="bottom" horizontal="center" slot="fixed" style={{marginBottom:'5%'}}>
-          <IonFabButton onClick={() => takePhoto()}>
-            <IonIcon icon={camera} />
-          </IonFabButton>
-            
-          
-        </IonFab>
+        <IonGrid>
+          <IonRow>
+            {photos.map((photo, index) => (
+              <IonCol size='6' key={index}>
+                <IonImg src={photo.webviewPath} />
+              </IonCol>
+            ))}
+          </IonRow>
+        </IonGrid>
       </IonContent>
+      
+      <IonFab vertical="bottom" horizontal="center" slot="fixed" style={{marginBottom:'5%'}}>
+        <IonFabButton onClick={() => takePhoto()}>
+          <IonIcon icon={camera} />
+        </IonFabButton>
+      </IonFab>
     </IonPage>
   );
 };
