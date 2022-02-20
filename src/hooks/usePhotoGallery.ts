@@ -22,14 +22,16 @@ export function usePhotoGallery() {
       const { value } = await Storage.get({key: PHOTO_STORAGE});
       const photosInStorage = (value ? JSON.parse(value) : []) as UserPhoto[];
 
-      for (let photo of photosInStorage) {
-        const file = await Filesystem.readFile({
-          path: photo.filepath,
-          directory: Directory.Data,
-        });
-        photo.webviewPath = `data:image/jpeg;base64,${file.data}`;
+      if(!isPlatform('hybrid')){
+        for (let photo of photosInStorage) {
+          const file = await Filesystem.readFile({
+            path: photo.filepath,
+            directory: Directory.Data,
+          });
+          photo.webviewPath = `data:image/jpeg;base64,${file.data}`;
+        }
+        setPhotos(photosInStorage);
       }
-      setPhotos(photosInStorage);
     };
     loadSaved();
   },[]);
@@ -80,8 +82,6 @@ export function usePhotoGallery() {
     setPhotos(newPhotos);
     Storage.set({key: PHOTO_STORAGE, value: JSON.stringify(newPhotos)});
   }
-
-  
 
   return {
     photos,
