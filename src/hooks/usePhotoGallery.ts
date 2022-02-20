@@ -35,17 +35,33 @@ export function usePhotoGallery() {
   },[]);
 
   const savePicture = async (photo: Photo, filename: string):Promise<UserPhoto> => {
-    const base64Data = await base64FromPath(photo.webPath!);
+    let base64Data: string;
+    // "hybrid" will detect Cordova or Capacitor;
+    if (isPlatform('hybrid')) {
+      const file = await Filesystem.readFile({
+        path: photo.path!,
+      });
+      base64Data = file.data;
+    } else {
+      base64Data = await base64FromPath(photo.webPath!);
+    }
     const savedFile = await Filesystem.writeFile({
       data: base64Data,
       directory: Directory.Data,
       path: filename
     });
-    
-    return {
-      filepath: filename,
-      webviewPath: photo.webPath,
-    };
+
+    if (isPlatform('hybrid')){
+      return {
+        filepath: savedFile.uri,
+        webviewPath: Capacitor.convertFileSrc(savedFile.uri)
+      }
+    } else {
+      return {
+        filepath: filename,
+        webviewPath: photo.webPath,
+      };
+    }
   };
 
   const takePhoto = async () => {
